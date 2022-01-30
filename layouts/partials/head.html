@@ -23,11 +23,20 @@
 <!-- Twitter Cards -->
 {{ template "_internal/twitter_cards.html" . }}
 
-<link rel="stylesheet" href="{{ "/css/semantic.min.css" | relURL }}" />
-<link rel="stylesheet" href="{{ "/css/icomoon.css" | relURL }}" />
-<link rel="stylesheet" href="{{ "/css/OverlayScrollbars.min.css" | relURL }}" />
-<link rel="stylesheet" href="{{ "/css/github-markdown.css" | relURL }}" />
-<link rel="stylesheet" href="{{ "/css/site.css" | relURL }}" />
+{{ $baseCSSa := resources.Get "css/site.css" }}
+{{ $baseCSSb := resources.Get "css/semantic.min.css" }}
+{{ $restCSS1 := resources.Get "css/icomoon.css" }}
+{{ $restCSS2 := resources.Get "css/github-markdown.css" }}
+{{ $restCSS3 := resources.Get "css/OverlayScrollbars.min.css" }}
+
+{{ $baseCSS := slice $baseCSSa $baseCSSb | resources.Concat "css/base.css" }}
+{{ $inlineCSS := $baseCSS |  resources.PostCSS }}
+<style type="text/CSS">
+{{ $inlineCSS.Content | safeCSS }}
+</style>
+
+{{ $style := slice $restCSS1 $restCSS2 $restCSS3 | resources.Concat "css/defer.css" | resources.PostCSS | resources.Minify | fingerprint }}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" media="print" onload="this.media='all'; this.onload=null;">
 
 <style>
   a:hover {
